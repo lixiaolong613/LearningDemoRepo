@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.Rect
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import com.example.madslearning.databinding.FragmentClipImageBinding
@@ -38,17 +39,10 @@ class ClipImageFragment: Fragment() {
 //        binding.ivOrigin.updateBitmap(BitmapUtils.drawableToBitmap(R.drawable.sample))
 //        binding.ivOrigin.updateUsefulRect(Rect(binding.ctlUsefulContainer.left, binding.ctlUsefulContainer.top, binding.ctlUsefulContainer.right, binding.ctlUsefulContainer.bottom))
 
-        binding.ctlOutContainer.setOnTouchListener(outContainerTouchListener)
     }
 
 
 
 
 
-    private val outContainerTouchListener by lazy {
-        View.OnTouchListener { v, event ->
-
-            true
-        }
-    }
 }

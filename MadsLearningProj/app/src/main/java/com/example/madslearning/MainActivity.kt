@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -16,6 +17,7 @@ import com.example.bitmapdemo.CustomItemDecorator
 import com.example.bitmapdemo.ImageWallBinder
 import com.example.bitmapdemo.NetworkUtils
 import com.example.madslearning.databinding.ActivityMainBinding
+import com.example.madslearning.fragment.GestureDetectFragment
 
 private const val TAG = "Demo - TAG"
 @RequiresApi(Build.VERSION_CODES.M)
@@ -27,36 +29,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private val urlList : MutableList<String>
         get() = mutableListOf(
             "http://e.hiphotos.baidu.com/image/pic/item/a1ec08fa513d2697e542494057fbb2fb4316d81e.jpg",
-//            "https://iconfont.alicdn.com/t/2a6a9c21-6b0d-4a8e-ba46-90390f968627.png",
-//            "https://iconfont.alicdn.com/t/5104a4dc-6e1c-449b-a759-63e690f9e144.png",
-//            "https://iconfont.alicdn.com/t/2d20e6a8-211b-474e-bb3a-6c5c1e4ea7cf.png",
-//            "https://iconfont.alicdn.com/t/0fa61035-9555-483e-92c8-3abeb89d139a.png",
-//            "https://iconfont.alicdn.com/t/c9a8dac7-1ae3-4d4d-8ee5-c6b24a75afe9.png",
-//            "https://iconfont.alicdn.com/t/4305a185-bd9c-4286-bb44-209acaf7ad7d.png",
-//            "https://iconfont.alicdn.com/t/534acfb1-1331-4c83-a6c0-4186ae8ad4e5.png",
-//            "https://iconfont.alicdn.com/t/685a561e-1280-442e-be19-14bdb5645d3d.png",
-//            "https://iconfont.alicdn.com/t/0e8317a4-bd97-4e67-af1e-d97b10bb0b0a.png",
-//            "https://iconfont.alicdn.com/t/ebb69aac-ea30-4260-ad3c-0b726cd2439d.png",
-//            "https://iconfont.alicdn.com/t/150a70a4-7e01-4d18-af40-09827e902260.png",
-//            "https://iconfont.alicdn.com/t/5a06b4e6-9cfc-4dd5-a786-dfe0622e92fc.png",
-//            "https://iconfont.alicdn.com/t/7b8b3fbd-10ba-478c-bdde-031526f4e853.png",
-//            "https://iconfont.alicdn.com/t/743e3163-a3f4-4aef-82cc-23247b2e870e.png",
-//            "https://iconfont.alicdn.com/t/424e4f01-0510-4de6-b079-6617cf25cc2d.png",
-//            "https://iconfont.alicdn.com/t/8911ec1d-8b45-4c62-aacc-2f83308ac87c.png",
-//            "https://iconfont.alicdn.com/t/394156db-a6ee-4568-893c-6ebe9b71c2b3.png",
-//            "https://iconfont.alicdn.com/t/a77891bf-b36d-4647-b83b-07548b536ba5.png",
-//            "https://iconfont.alicdn.com/t/fc034ff1-20fe-4af4-bb69-945e1acec99e.png",
-//            "https://iconfont.alicdn.com/t/30d6dfc8-e9a6-434f-baed-2ce55971687c.png",
-//            "https://iconfont.alicdn.com/t/08384701-db9a-446a-97cf-b6bf6aae16ba.png",
-//            "https://iconfont.alicdn.com/t/3b9bef53-2e0e-40c2-a41a-1e879979ae1d.png",
-//            "https://iconfont.alicdn.com/t/fc513afc-23f6-4d13-a112-c40a59508060.png",
-//            "https://iconfont.alicdn.com/t/fc513afc-23f6-4d13-a112-c40a59508060.png",
-//            "https://iconfont.alicdn.com/t/f5371a6b-56f1-440e-ad14-8aabcf14b284.png",
-//            "https://iconfont.alicdn.com/t/c2b8956b-c4e2-4a81-a245-e1f3713cdd5c.png",
-//            "https://iconfont.alicdn.com/t/0e5eda8b-e53c-4659-9062-5a2dc82a45e6.png",
-//            "https://iconfont.alicdn.com/t/2172a269-5f21-4e6d-bcb6-e68137ab43fc.png",
-//            "https://iconfont.alicdn.com/t/a36e8455-1350-40fb-af19-ba6c661d3817.png",
-//            "https://iconfont.alicdn.com/t/b8253ed6-5142-44c8-9b28-97fcfecb213d.png"
         )
 
     private val adapter: MultiTypeAdapter by lazy { MultiTypeAdapter() }
@@ -127,6 +99,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             binding.rvMyImageWall.visibility = View.VISIBLE
         }
         binding.btn1.setOnClickListener(this)
+        binding.btn2.setOnClickListener(this)
     }
 
     private fun checkWifi(listener: ShowImageWhenNotWIFIListener?) {
@@ -157,6 +130,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 val transac = supportFragmentManager.beginTransaction()
                 transac.setReorderingAllowed(true)
                 transac.add(R.id.fg_container, ClipImageFragment::class.java, null, ClipImageFragment.TAG)
+                transac.commit()
+            }
+            R.id.btn2 -> {
+                binding.rvMyImageWall.visibility = View.GONE
+                if (supportFragmentManager.findFragmentByTag(GestureDetectFragment.TAG) != null) {
+                    return
+                }
+                val transac = supportFragmentManager.beginTransaction()
+                transac.setReorderingAllowed(true)
+                transac.add(R.id.fg_container, GestureDetectFragment::class.java, null, GestureDetectFragment.TAG)
                 transac.commit()
             }
         }

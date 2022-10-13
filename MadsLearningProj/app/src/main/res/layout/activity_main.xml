@@ -38,6 +38,16 @@
         android:background="@drawable/tv_strong_background"
         android:text="裁剪"/>
 
+    <TextView
+        android:id="@+id/btn2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn1"
+        android:layout_marginStart="10dp"
+        android:padding="5dp"
+        android:background="@drawable/tv_strong_background"
+        android:text="detect"/>
 
     <TextView
         android:id="@+id/tv_try_other"
@@ -45,7 +55,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="测试其他功能"
+        android:text="测试其他"
         />
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fg_container"
