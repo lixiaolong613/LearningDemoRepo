@@ -38,7 +38,9 @@ class ClipImageFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 //        binding.ivOrigin.updateBitmap(BitmapUtils.drawableToBitmap(R.drawable.sample))
 //        binding.ivOrigin.updateUsefulRect(Rect(binding.ctlUsefulContainer.left, binding.ctlUsefulContainer.top, binding.ctlUsefulContainer.right, binding.ctlUsefulContainer.bottom))
-
+//        binding.ivOrigin.setOnClickListener {
+//            Log.i(TAG, "image click")
+//        }
     }
 
 

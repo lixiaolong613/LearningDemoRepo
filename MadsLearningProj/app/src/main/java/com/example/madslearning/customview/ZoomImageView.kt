@@ -5,10 +5,8 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.Log
-import android.view.MotionEvent
-import android.view.ScaleGestureDetector
-import android.view.View
-import android.view.ViewTreeObserver
+import android.view.*
+import com.example.madslearning.customview.TouchDetector
 
 
 /**
@@ -32,9 +30,66 @@ class ZoomImageView(
     constructor(context: Context): this(context, null)
     constructor(context: Context, attrs: AttributeSet?): this(context, attrs, 0)
 
+
+
+    val customDetector = TouchDetector(context)
+    val customDetectorListener = object : TouchDetector.DefaultDetectorListener() {
+        override fun onMoveBegin(): Boolean {
+            Log.i(TAG, "onMoveBegin")
+            return true
+        }
+
+        override fun onMove(dx: Float, dy: Float) {
+            Log.i(TAG, "onMove. dx = $dx, dy = $dy")
+            scaleMatrix?.let {
+                it.postTranslate(dx, dy)
+                adjustPosition()
+                imageMatrix = it
+            }
+        }
+
+        override fun onMoveEnd() {
+            Log.i(TAG, "onMoveEnd")
+        }
+
+        override fun onScaleBegin(): Boolean {
+            Log.i(TAG,"onScaleBegin")
+            return true
+        }
+
+        override fun onScale(scaleFactor: Float, focusX: Float, focusY: Float) {
+            drawable?.let {
+                Log.i(
+                    TAG,
+                    "scaleFactor = $scaleFactor, width = ${width}, height = $height drawable.w = ${drawable?.intrinsicWidth}, drawable.h = ${drawable?.intrinsicHeight}"
+                )
+                var finaleFactor = scaleFactor
+                val minS = minScale?:(Int.MIN_VALUE + 1f)
+                val curScale = getCurScale()
+                if (curScale >= minS) {
+                    if (scaleFactor <= 1 && curScale * scaleFactor < minS) {
+                        finaleFactor = minS/curScale
+                    }
+                    scaleMatrix?.let {
+                        it.postScale(finaleFactor, finaleFactor, focusX, focusY)
+                        adjustPosition()
+                        imageMatrix = it
+                    }
+                }
+            }
+        }
+
+        override fun onScaleEnd() {
+            Log.i(TAG,"onScaleEnd")
+        }
+    }
+
     init {
         scaleType = ScaleType.MATRIX
         setOnTouchListener(this)
+        customDetector.scaleEnable = true
+        customDetector.moveEnable = true
+        customDetector.listener = customDetectorListener
     }
 
     override fun onAttachedToWindow() {
@@ -98,8 +153,16 @@ class ZoomImageView(
     }
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-        return scaleGestureDetector.onTouchEvent(event)
+//        scaleGestureDetector.onTouchEvent(event)
+        event?.let {
+            customDetector.onTouchEvent(it)
+        }
+
+        return true
     }
+
+
+    /****************系统组件部分******************/
 
     override fun onScaleBegin(detector: ScaleGestureDetector?): Boolean {
         val scaleFactor = detector?.scaleFactor?:1f
@@ -145,7 +208,7 @@ class ZoomImageView(
     }
 
     override fun onScaleEnd(detector: ScaleGestureDetector?) {
-
+        Log.i(TAG, "onScaleEnd.")
     }
 }
 
