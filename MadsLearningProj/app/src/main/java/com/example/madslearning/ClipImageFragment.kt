@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
+import com.example.madslearning.R
 import com.example.madslearning.databinding.FragmentClipImageBinding
 
 /**
@@ -22,8 +23,6 @@ class ClipImageFragment: Fragment() {
 
     private lateinit var binding: FragmentClipImageBinding
     private val ratio = 0.5625//9:16
-
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,6 +40,10 @@ class ClipImageFragment: Fragment() {
 //        binding.ivOrigin.setOnClickListener {
 //            Log.i(TAG, "image click")
 //        }
+        binding.tvTitle.setOnClickListener {
+            binding.ivOrigin.setImageResource(R.drawable.sample)
+//            binding.ivOrigin.setImageResource(R.drawable.tv_strong_background)
+        }
     }
 
 

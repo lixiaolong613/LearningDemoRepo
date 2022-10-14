@@ -18,6 +18,8 @@ class TouchDetector(context: Context) {
     }
 
     abstract class DefaultDetectorListener: DetectorListener {
+        override fun onTouchRelease() {}
+
         override fun onMoveBegin() = true
 
         override fun onMove(dx: Float, dy: Float){}
@@ -32,6 +34,8 @@ class TouchDetector(context: Context) {
     }
 
     interface DetectorListener {
+
+        fun onTouchRelease()
 
         fun onMoveBegin(): Boolean
 
@@ -184,6 +188,8 @@ class TouchDetector(context: Context) {
             }
             //init scaleProcess state
             resetScaleState()
+
+            listener?.onTouchRelease()
 
             return
         }

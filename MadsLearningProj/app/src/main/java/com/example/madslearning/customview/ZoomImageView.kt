@@ -18,7 +18,7 @@ class ZoomImageView(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-): androidx.appcompat.widget.AppCompatImageView(context, attrs, defStyleAttr), View.OnTouchListener, ScaleGestureDetector.OnScaleGestureListener, ViewTreeObserver.OnGlobalLayoutListener{
+): androidx.appcompat.widget.AppCompatImageView(context, attrs, defStyleAttr), View.OnTouchListener, ViewTreeObserver.OnGlobalLayoutListener{
 
     companion object{
         const val TAG = "ZoomImageView"
@@ -30,10 +30,13 @@ class ZoomImageView(
     constructor(context: Context): this(context, null)
     constructor(context: Context, attrs: AttributeSet?): this(context, attrs, 0)
 
+    private val customDetector = TouchDetector(context)
+    private val customDetectorListener = object : TouchDetector.DefaultDetectorListener() {
+        override fun onTouchRelease() {
+            adjustPositionWhenRelease()
+            super.onTouchRelease()
+        }
 
-
-    val customDetector = TouchDetector(context)
-    val customDetectorListener = object : TouchDetector.DefaultDetectorListener() {
         override fun onMoveBegin(): Boolean {
             Log.i(TAG, "onMoveBegin")
             return true
@@ -41,10 +44,11 @@ class ZoomImageView(
 
         override fun onMove(dx: Float, dy: Float) {
             Log.i(TAG, "onMove. dx = $dx, dy = $dy")
-            scaleMatrix?.let {
-                it.postTranslate(dx, dy)
-                adjustPosition()
-                imageMatrix = it
+            drawable?.let {
+                scaleMatrix?.let {
+                    it.postTranslate(dx, dy)
+                    imageMatrix = it
+                }
             }
         }
 
@@ -72,7 +76,6 @@ class ZoomImageView(
                     }
                     scaleMatrix?.let {
                         it.postScale(finaleFactor, finaleFactor, focusX, focusY)
-                        adjustPosition()
                         imageMatrix = it
                     }
                 }
@@ -104,34 +107,41 @@ class ZoomImageView(
 
     override fun onGlobalLayout() {
         drawable?.let {
-            //获取图片宽高
-            val imgWidth: Int = it.intrinsicWidth
-            val imgHeight: Int = it.intrinsicHeight
-            //获取imageview宽高
-            val width = width
-            val height = height
-
-            var scale = 1f
-            scale = (width.toFloat() / imgWidth).coerceAtLeast(height.toFloat() / imgHeight)
-            Log.i(TAG, "init scale = $scale")
-            if (scaleMatrix == null) {
-                scaleMatrix = Matrix()
-                minScale = scale
-            }
-            scaleMatrix?.let {
-                it.postTranslate((width - imgWidth) / 2f, (height - imgHeight) / 2f)//先把图片移动到控件中心
-                it.postScale(scale, scale, width/2f, height/2f)//后面两个参数标识缩放中心点
-                imageMatrix = it
-            }
+            resetImageInRect()
         }?: kotlin.run {
             Log.i(TAG, "drawable = null")
         }
     }
 
-    /**
-     * 手势检测
-     */
-    var scaleGestureDetector = ScaleGestureDetector(context, this)
+    private val minRect: RectF by lazy { RectF(0f, 0f, width.toFloat(), height.toFloat()) }
+
+    fun updateMinRect(rect: RectF) {
+        minRect.set(rect)
+        resetImageInRect()
+    }
+
+    private fun resetImageInRect() {
+        drawable?.let { image ->
+            //获取图片宽高
+            val imgWidth: Int = image.intrinsicWidth
+            val imgHeight: Int = image.intrinsicHeight
+            //获取minRect宽高
+            val width = minRect.width()
+            val height = minRect.height()
+            var scale = (width / imgWidth).coerceAtLeast(height / imgHeight)
+            Log.i(TAG, "init scale = $scale, imgWidth = $imgWidth, width = $width")
+
+            minScale = scale
+
+            scaleMatrix = Matrix()
+            scaleMatrix?.let {
+                //todo 这里顺序有问题
+                it.postScale(scale, scale, 0f, 0f)//先对图片进行缩放，后面两个参数标识缩放中心点
+                it.postTranslate(minRect.left, minRect.top)//再先把图片移动到rect中心
+                imageMatrix = it
+            }
+        }
+    }
 
     private var scaleMatrix : Matrix? = null
 
@@ -144,7 +154,7 @@ class ZoomImageView(
     /**
      * 获取当前缩放比例
      */
-    fun getCurScale(): Float {
+    private fun getCurScale(): Float {
         scaleMatrix?.let {
             it.getValues(martixValue)
             return martixValue[Matrix.MSCALE_X]
@@ -153,62 +163,67 @@ class ZoomImageView(
     }
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-//        scaleGestureDetector.onTouchEvent(event)
         event?.let {
             customDetector.onTouchEvent(it)
         }
-
         return true
     }
 
-
-    /****************系统组件部分******************/
-
-    override fun onScaleBegin(detector: ScaleGestureDetector?): Boolean {
-        val scaleFactor = detector?.scaleFactor?:1f
-        Log.i(TAG, "onScaleBegin. scaleFactor = $scaleFactor")
-        return true
+    fun adjustPositionWhenRelease() {
+        //这里主要是通过mapRect计算出预期位置，然后在这里直接进行调整
+        adjustScale()
+        adjustPosition()
     }
 
-
-
-    override fun onScale(detector: ScaleGestureDetector?): Boolean {
-        drawable?.let {
-            detector?.let { det ->
-                var scaleFactor = detector.scaleFactor
-                Log.i(
-                    TAG,
-                    "scaleFactor = $scaleFactor, width = ${width}, height = $height drawable.w = ${drawable?.intrinsicWidth}, drawable.h = ${drawable?.intrinsicHeight}"
-                )
-                val minS = minScale?:(Int.MIN_VALUE + 1f)
-                val curScale = getCurScale()
-                if (curScale >= minS) {
-                    if (scaleFactor <= 1 && curScale * scaleFactor < minS) {
-                        scaleFactor = minS/curScale
-                    }
-                    scaleMatrix?.let {
-                        it.postScale(scaleFactor, scaleFactor, det.focusX, det.focusY)
-                        adjustPosition()
-                        imageMatrix = it
-                    }
+    //如果图片任意一边的尺寸比minRect小，就以minRect左上角为中心对图片进行放大
+    private fun adjustScale() {
+        drawable?.let { d ->
+            scaleMatrix?.let { mat ->
+                val rectF = RectF()
+                rectF.set(0f, 0f, d.intrinsicWidth.toFloat(), d.intrinsicHeight.toFloat())
+                mat.mapRect(rectF)//对rectF的矩形进行matrix变换，并将值写会rectF的四个顶点，用来模拟原始图片的缩放/平移/旋转操作
+                if (rectF.width() < minRect.width() || rectF.height() < minRect.height()) {
+                    //计算放大倍数
+                    var scale = (minRect.width() / rectF.width()).coerceAtLeast(minRect.height() / rectF.height())
+                    mat.postScale(scale, scale, (rectF.left + rectF.right) / 2, (rectF.top + rectF.bottom) / 2)//已图片本身的中心点放大
+                    imageMatrix = mat
                 }
             }
         }
-        return true
+
     }
 
-    fun adjustPosition() {
-        //这里主要是通过mapRect计算出预期位置，然后在这里直接进行调整
-        val rectF = RectF()
-        val d = drawable
-        if (d != null) {
-            rectF[0f, 0f, d.intrinsicWidth.toFloat()] = d.intrinsicHeight.toFloat()
-            matrix.mapRect(rectF)//对rectF的矩形进行matrix变换，并将值写会rectF的四个顶点，用来模拟原始图片的缩放/平移/旋转操作
+    //如果图片位置不能占满minRect，就把图片先移动到minRect左上角
+    private fun adjustPosition() {
+        drawable?.let { d ->
+            scaleMatrix?.let { mat ->
+                val rectF = RectF()
+                rectF.set(0f, 0f, d.intrinsicWidth.toFloat(), d.intrinsicHeight.toFloat())
+                mat.mapRect(rectF)//对rectF的矩形进行matrix变换，并将值写会rectF的四个顶点，用来模拟原始图片的缩放/平移/旋转操作
+
+                var moveX = 0f
+                if (rectF.left > minRect.left) {
+                    //需要向左移
+                    moveX = minRect.left - rectF.left
+                } else if (rectF.right < minRect.right) {
+                    //向右移
+                    moveX = minRect.right - rectF.right
+                }
+
+                var moveY = 0f
+                if (rectF.top > minRect.top) {
+                    //向上移
+                    moveY = minRect.top - rectF.top
+                } else if (rectF.bottom < minRect.bottom) {
+                    //向下移动
+                    moveY = minRect.bottom - rectF.bottom
+                }
+
+                mat.postTranslate(moveX, moveY)
+                imageMatrix = mat
+            }
+
         }
-    }
-
-    override fun onScaleEnd(detector: ScaleGestureDetector?) {
-        Log.i(TAG, "onScaleEnd.")
     }
 }
 
