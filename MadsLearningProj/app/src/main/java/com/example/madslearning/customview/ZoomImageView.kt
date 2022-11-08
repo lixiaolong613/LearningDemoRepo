@@ -3,10 +3,16 @@ package com.example.bitmapdemo.customview
 import android.content.Context
 import android.graphics.Matrix
 import android.graphics.RectF
+import android.graphics.drawable.NinePatchDrawable
+import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
 import android.view.*
+import androidx.core.graphics.createBitmap
+import androidx.core.view.drawToBitmap
 import com.example.madslearning.customview.TouchDetector
+import java.io.File
+import kotlin.io.path.toPath
 
 
 /**
@@ -21,7 +27,7 @@ class ZoomImageView(
 ): androidx.appcompat.widget.AppCompatImageView(context, attrs, defStyleAttr), View.OnTouchListener, ViewTreeObserver.OnGlobalLayoutListener{
 
     companion object{
-        const val TAG = "ZoomImageView"
+        private const val TAG = "ZoomImageView"
         const val ACTION_NONE = 0
         const val ACTION_MOVE = 1
         const val ACTION_SCALE = 2
@@ -93,6 +99,11 @@ class ZoomImageView(
         customDetector.scaleEnable = true
         customDetector.moveEnable = true
         customDetector.listener = customDetectorListener
+        var file: File? = null
+        file?.let {
+            it.toURI().toString()
+            it.path
+        }
     }
 
     override fun onAttachedToWindow() {
@@ -107,6 +118,7 @@ class ZoomImageView(
 
     override fun onGlobalLayout() {
         drawable?.let {
+            updateMinRect(minRect)
             resetImageInRect()
         }?: kotlin.run {
             Log.i(TAG, "drawable = null")
@@ -135,9 +147,16 @@ class ZoomImageView(
 
             scaleMatrix = Matrix()
             scaleMatrix?.let {
-                //todo 这里顺序有问题
                 it.postScale(scale, scale, 0f, 0f)//先对图片进行缩放，后面两个参数标识缩放中心点
-                it.postTranslate(minRect.left, minRect.top)//再先把图片移动到rect中心
+                //图片经过缩放后的中心点
+                val finalImgCenterX = scale * imgWidth / 2
+                val finalImgCenterY = scale * imgHeight / 2
+                //minRect的中心点
+                val rectCenterX = (minRect.left + minRect.right) / 2
+                val rectCenterY = (minRect.top + minRect.bottom) / 2
+                it.postTranslate(rectCenterX - finalImgCenterX, rectCenterY - finalImgCenterY)//再先把图片中心和minRect中心重合（图片移动到minRect中心）
+                //如果需要图片左上角与minRect重合则采用下面的方法
+//                it.postTranslate(minRect.left, minRect.top)
                 imageMatrix = it
             }
         }
@@ -175,7 +194,7 @@ class ZoomImageView(
         adjustPosition()
     }
 
-    //如果图片任意一边的尺寸比minRect小，就以minRect左上角为中心对图片进行放大
+    //如果图片任意一边的尺寸比minRect小，就以图片本身的中心点对图片进行放大
     private fun adjustScale() {
         drawable?.let { d ->
             scaleMatrix?.let { mat ->
@@ -185,7 +204,7 @@ class ZoomImageView(
                 if (rectF.width() < minRect.width() || rectF.height() < minRect.height()) {
                     //计算放大倍数
                     var scale = (minRect.width() / rectF.width()).coerceAtLeast(minRect.height() / rectF.height())
-                    mat.postScale(scale, scale, (rectF.left + rectF.right) / 2, (rectF.top + rectF.bottom) / 2)//已图片本身的中心点放大
+                    mat.postScale(scale, scale, (rectF.left + rectF.right) / 2, (rectF.top + rectF.bottom) / 2)//以图片本身的中心点缩放
                     imageMatrix = mat
                 }
             }

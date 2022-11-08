@@ -1,13 +1,13 @@
 package com.example.bitmapdemo
 
-import android.graphics.Bitmap
-import android.graphics.Matrix
-import android.graphics.Rect
+import android.graphics.*
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import com.example.madslearning.R
+import com.example.madslearning.customview.Helper
+import com.example.madslearning.customview.enableScaleAndMove
 import com.example.madslearning.databinding.FragmentClipImageBinding
 
 /**
@@ -33,19 +33,47 @@ class ClipImageFragment: Fragment() {
         return binding.root
     }
 
+    val helper by lazy {  Helper(binding.ivOrigin) }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        binding.ivOrigin.updateBitmap(BitmapUtils.drawableToBitmap(R.drawable.sample))
-//        binding.ivOrigin.updateUsefulRect(Rect(binding.ctlUsefulContainer.left, binding.ctlUsefulContainer.top, binding.ctlUsefulContainer.right, binding.ctlUsefulContainer.bottom))
-//        binding.ivOrigin.setOnClickListener {
-//            Log.i(TAG, "image click")
-//        }
+        binding.ivOrigin.enableScaleAndMove(true, true, helper)
+
         binding.tvTitle.setOnClickListener {
+            BitmapUtils.drawableToBitmap(R.drawable.sample)?.let {
+                binding.ivOrigin.setImageBitmap(
+                    BitmapUtils.mergeBitmap(
+                        it, BitmapUtils.waterMarkBitmap(
+                            "hello",
+                            30,
+                            Color.parseColor("#FFFFFFFF"),
+                            it.width,
+                            it.height
+                        )
+                    )
+                )
+            }
             binding.ivOrigin.setImageResource(R.drawable.sample)
-//            binding.ivOrigin.setImageResource(R.drawable.tv_strong_background)
+        }
+
+        binding.ctlUsefulContainer.viewTreeObserver.addOnGlobalLayoutListener(
+            object : ViewTreeObserver.OnGlobalLayoutListener{
+                override fun onGlobalLayout() {
+                    val rect = Rect()
+                    binding.ctlUsefulContainer.getHitRect(rect)
+                    helper.updateMinRect(RectF(rect))
+                    binding.ctlUsefulContainer.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                }
+            }
+        )
+
+        binding.tvSend.setOnClickListener {
+            BitmapUtils.drawableToBitmap(R.drawable.sample)?.let {
+                binding.ivOrigin.setImageBitmap(it)
+            }
+//            binding.ivOrigin.setImageResource(R.drawable.honour_icon)
         }
     }
-
 
 
 

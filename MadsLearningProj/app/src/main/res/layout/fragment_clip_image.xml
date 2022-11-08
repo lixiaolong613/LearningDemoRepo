@@ -7,12 +7,14 @@
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"
-        android:text="图片裁剪fragment"/>
+        android:gravity="center"
+        android:background="#FF0000"
+        android:text="点击此处加载可裁剪图片fragment"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ctl_out_container"
@@ -22,7 +24,16 @@
         app:layout_constraintBottom_toTopOf="@id/tv_send"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-        <com.example.bitmapdemo.customview.ZoomImageView
+<!--        <com.example.bitmapdemo.customview.ZoomImageView-->
+<!--            android:id="@+id/iv_origin"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="0dp"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"/>-->
+
+        <ImageView
             android:id="@+id/iv_origin"
             android:layout_width="0dp"
             android:layout_height="0dp"
