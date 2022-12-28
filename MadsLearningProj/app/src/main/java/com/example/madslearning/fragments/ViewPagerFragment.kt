@@ -52,7 +52,7 @@ class ViewPagerFragment: Fragment() {
 
 
     internal class DemoViewPagerAdapter(fm: FragmentManager): FragmentStatePagerAdapter(fm) {
-        override fun getCount() = 5
+        override fun getCount() = 1
 
         override fun getItem(position: Int): Fragment {
             return ViewPagerContentFragment.makeInstance(position + 1)

@@ -72,5 +72,7 @@ dependencies {
 //    implementation 'com.facebook.fresco:webpsupport:2.1.0'
 
     //以下依赖是为了使用协程
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
 }

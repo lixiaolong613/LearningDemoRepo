@@ -6,7 +6,20 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
-        android:id="@+id/tv_content"
+        android:id="@+id/center"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="center"
+        android:textColor="@color/black"
+        android:background="@color/white"/>
+
+    <TextView
+        android:id="@+id/tv_top"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:gravity="center"
@@ -18,14 +31,82 @@
         android:background="@color/white"/>
 
     <TextView
-        android:id="@+id/tv_content2"
+        android:id="@+id/tv_bottom"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/tv_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="content2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="bottom"
+        android:textColor="@color/black"
+        android:background="@color/white"/>
+
+    <TextView
+        android:id="@+id/tv_left"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="left"
+        android:textColor="@color/black"
+        android:background="@color/white"/>
+
+    <TextView
+        android:id="@+id/tv_right"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="right"
+        android:textColor="@color/black"
+        android:background="@color/white"/>
+
+    <TextView
+        android:id="@+id/tv_top_right"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="top right"
+        android:textColor="@color/black"
+        android:background="@color/white"/>
+
+    <TextView
+        android:id="@+id/tv_top_left"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="top right"
+        android:textColor="@color/black"
+        android:background="@color/white"/>
+
+    <TextView
+        android:id="@+id/tv_bottom_right"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="top right"
+        android:textColor="@color/black"
+        android:background="@color/white"/>
+
+    <TextView
+        android:id="@+id/tv_bottom_left"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="top right"
         android:textColor="@color/black"
         android:background="@color/white"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

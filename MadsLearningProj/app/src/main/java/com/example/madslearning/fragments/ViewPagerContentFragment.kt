@@ -10,9 +10,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
 import com.example.madslearning.R
 import com.example.madslearning.databinding.FragmentViewpagerContentBinding
 import com.example.madslearning.databinding.RecyclerViewItemBinding
+import com.example.madslearning.utils.MathematicsUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -65,7 +68,7 @@ class ViewPagerContentFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.i(TAG, "onViewCreated for fragment $index")
-        binding.tvContent.text = "index_$index"
+        binding.center.text = "index_$index"
     }
 
     //region lifecycle function
@@ -77,6 +80,17 @@ class ViewPagerContentFragment: Fragment() {
     override fun onResume() {
         super.onResume()
         Log.i(TAG, "onResume for fragment $index")
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(1_000)
+            binding.tvTop.text = "${MathematicsUtils.getRotateDegFromView(binding.center, binding.tvTop)}"
+            binding.tvTopRight.text = "${MathematicsUtils.getRotateDegFromView(binding.center, binding.tvTopRight)}"
+            binding.tvTopLeft.text = "${MathematicsUtils.getRotateDegFromView(binding.center, binding.tvTopLeft)}"
+            binding.tvLeft.text = "${MathematicsUtils.getRotateDegFromView(binding.center, binding.tvLeft)}"
+            binding.tvRight.text = "${MathematicsUtils.getRotateDegFromView(binding.center, binding.tvRight)}"
+            binding.tvBottom.text = "${MathematicsUtils.getRotateDegFromView(binding.center, binding.tvBottom)}"
+            binding.tvBottomRight.text = "${MathematicsUtils.getRotateDegFromView(binding.center, binding.tvBottomRight)}"
+            binding.tvBottomLeft.text = "${MathematicsUtils.getRotateDegFromView(binding.center, binding.tvBottomLeft)}"
+        }
     }
 
     override fun onPause() {
