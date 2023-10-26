@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">MadsLearning</string>
+    <string name="title_demodynamicfeature">DemoDynamicFeat</string>
+    <string name="title_demofeature2">DemoFeatureTitle2</string>
+    <string name="title_dynamicfeature3">feature3</string>
+    <string name="title_instantdynamicfeature">Module Title</string>
 </resources>

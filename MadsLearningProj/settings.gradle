@@ -14,3 +14,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "MadsLearning"
 include ':app'
+//include ':demomodule'
+include ':demoDynamicFeature'
+include ':DemoFeature2'

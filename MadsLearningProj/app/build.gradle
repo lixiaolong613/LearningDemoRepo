@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'base'
 //    id 'kotlin-android-extensions'
 }
 
@@ -15,6 +16,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+//        missingDimensionStrategy("api", "minApi24")
+//        missingDimensionStrategy("version", "demo")
     }
 
     buildTypes {
@@ -22,10 +25,27 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {
+            applicationIdSuffix  ".debug"
+            debuggable true
+        }
+        staging {
+            initWith debug
+            applicationIdSuffix ".debugStaging"
+        }
     }
+
+//    variantFilter { variant ->
+//        def names = variant.flavors*.name
+//        // To check for a certain build type, use variant.buildType.name == "<buildType>"
+//        if (names.contains("minApi23") && names.contains("demo")) {
+//            // Gradle ignores any variants that satisfy the conditions above.
+//            setIgnore(true)
+//        }
+//    }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -35,6 +55,11 @@ android {
     viewBinding{
         enabled = true
     }
+    dynamicFeatures = [':demoDynamicFeature', ':DemoFeature2']
+}
+
+configurations {
+
 }
 
 dependencies {
@@ -74,4 +99,8 @@ dependencies {
     //以下依赖是为了使用协程
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
+
+    implementation 'org.apache.lucene:lucene-core:4.0.0'
 }

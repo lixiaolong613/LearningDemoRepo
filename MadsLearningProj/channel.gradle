@@ -1,0 +1,33 @@
+android {
+    flavorDimensions "api","version"
+    productFlavors {
+        demo {
+            dimension "version"
+            applicationIdSuffix ".demo"
+            versionNameSuffix "-demo"
+        }
+        full {
+            dimension "version"
+            applicationIdSuffix ".full"
+            versionNameSuffix "-full"
+        }
+        minApi24 {
+            dimension "api"
+            applicationIdSuffix ".api24"
+            versionNameSuffix "-api24"
+        }
+        minApi23 {
+            dimension "api"
+            applicationIdSuffix ".api23"
+            versionNameSuffix "-api23"
+        }
+    }
+    variantFilter { variant ->
+        def  name = variant.flavors*.name
+        if (name.contains("minApi23") && !name.contains(full)) {
+            setIgnore(true)
+        } else {
+            setIgnore(!(name.contains("minApi24") && name.contains("demo")))
+        }
+    }
+}

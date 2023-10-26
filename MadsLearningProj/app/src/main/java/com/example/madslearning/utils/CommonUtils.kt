@@ -1,9 +1,13 @@
 package com.example.bitmapdemo
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.util.DisplayMetrics
 
+@SuppressLint("StaticFieldLeak")
 object CommonUtils {
     private var sBaseContext: Context? = null
     private lateinit var sAppContext: Context
@@ -34,6 +38,12 @@ object CommonUtils {
     fun <T> getSystemService(service: String): T?{
         return getContext().getSystemService(service) as? T
     }
+
+    val packageManager: PackageManager
+        get() = getContext().packageManager
+
+    val applicationInfo: ApplicationInfo
+        get() = packageManager.getApplicationInfo(getContext().packageName, 0)
 }
 
 val Number.dp : Int inline get() = CommonUtils.dp2px(this.toFloat())
